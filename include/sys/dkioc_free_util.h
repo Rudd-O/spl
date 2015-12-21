@@ -22,55 +22,33 @@
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef _SPL_TIME_H
-#define	_SPL_TIME_H
+#ifndef _SPL_DKIOC_UTIL_H
+#define	_SPL_DKIOC_UTIL_H
 
-#include <linux/module.h>
-#include <linux/time.h>
-#include <sys/types.h>
-#include <sys/timer.h>
+#include <sys/dkio.h>
 
-#if defined(CONFIG_64BIT)
-#define	TIME_MAX			INT64_MAX
-#define	TIME_MIN			INT64_MIN
-#else
-#define	TIME_MAX			INT32_MAX
-#define	TIME_MIN			INT32_MIN
-#endif
+typedef struct dkioc_free_list_ext_s {
+	uint64_t		dfle_start;
+	uint64_t		dfle_length;
+} dkioc_free_list_ext_t;
 
-#define	SEC				1
-#define	MILLISEC			1000
-#define	MICROSEC			1000000
-#define	NANOSEC				1000000000
+typedef struct dkioc_free_list_s {
+	uint64_t		dfl_flags;
+	uint64_t		dfl_num_exts;
+	int64_t			dfl_offset;
 
-#define	MSEC2NSEC(m)	((hrtime_t)(m) * (NANOSEC / MILLISEC))
-#define	NSEC2MSEC(n)	((n) / (NANOSEC / MILLISEC))
+	/*
+	 * N.B. this is only an internal debugging API! This is only called
+	 * from debug builds of sd for pre-release checking. Remove before GA!
+	 */
+	void			(*dfl_ck_func)(uint64_t, uint64_t, void *);
+	void			*dfl_ck_arg;
 
-static const int hz = HZ;
+	dkioc_free_list_ext_t	dfl_exts[1];
+} dkioc_free_list_t;
 
-#define	TIMESPEC_OVERFLOW(ts)		\
-	((ts)->tv_sec < TIME_MIN || (ts)->tv_sec > TIME_MAX)
-
-static inline void
-gethrestime(timestruc_t *now)
-{
-	*now = current_kernel_time();
+static inline void dfl_free(dkioc_free_list_t *dfl) {
+	kmem_free(dfl, DFL_SZ(dfl->dfl_num_exts));
 }
 
-static inline time_t
-gethrestime_sec(void)
-{
-	struct timespec ts;
-	ts = current_kernel_time();
-	return (ts.tv_sec);
-}
-
-static inline hrtime_t
-gethrtime(void)
-{
-	struct timespec now;
-	getrawmonotonic(&now);
-	return (((hrtime_t)now.tv_sec * NSEC_PER_SEC) + now.tv_nsec);
-}
-
-#endif  /* _SPL_TIME_H */
+#endif /* _SPL_DKIOC_UTIL_H */
