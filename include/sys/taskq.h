@@ -105,6 +105,7 @@ typedef struct taskq_ent {
 	void			*tqent_arg;
 	taskq_t			*tqent_taskq;
 	uintptr_t		tqent_flags;
+	unsigned long		tqent_birth;
 } taskq_ent_t;
 
 #define	TQENT_FLAG_PREALLOC	0x1
@@ -140,7 +141,7 @@ extern void taskq_wait_id(taskq_t *, taskqid_t);
 extern void taskq_wait_outstanding(taskq_t *, taskqid_t);
 extern void taskq_wait(taskq_t *);
 extern int taskq_cancel_id(taskq_t *, taskqid_t);
-extern int taskq_member(taskq_t *, void *);
+extern int taskq_member(taskq_t *, kthread_t *);
 
 #define	taskq_create_proc(name, nthreads, pri, min, max, proc, flags) \
     taskq_create(name, nthreads, pri, min, max, flags)
