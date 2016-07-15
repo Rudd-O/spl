@@ -39,12 +39,14 @@ AC_DEFUN([SPL_AC_CONFIG_KERNEL], [
 	SPL_AC_2ARGS_ZLIB_DEFLATE_WORKSPACESIZE
 	SPL_AC_SHRINK_CONTROL_STRUCT
 	SPL_AC_RWSEM_SPINLOCK_IS_RAW
+	SPL_AC_RWSEM_ACTIVITY
 	SPL_AC_SCHED_RT_HEADER
 	SPL_AC_2ARGS_VFS_GETATTR
 	SPL_AC_USLEEP_RANGE
 	SPL_AC_KMEM_CACHE_ALLOCFLAGS
 	SPL_AC_WAIT_ON_BIT
 	SPL_AC_MUTEX_OWNER
+	SPL_AC_INODE_LOCK
 ])
 
 AC_DEFUN([SPL_AC_MODULE_SYMVERS], [
@@ -1316,6 +1318,30 @@ AC_DEFUN([SPL_AC_RWSEM_SPINLOCK_IS_RAW], [
 ])
 
 dnl #
+dnl # 3.16 API Change
+dnl #
+dnl # rwsem-spinlock "->activity" changed to "->count"
+dnl #
+AC_DEFUN([SPL_AC_RWSEM_ACTIVITY], [
+	AC_MSG_CHECKING([whether struct rw_semaphore has member activity])
+	tmp_flags="$EXTRA_KCFLAGS"
+	EXTRA_KCFLAGS="-Werror"
+	SPL_LINUX_TRY_COMPILE([
+		#include <linux/rwsem.h>
+	],[
+		struct rw_semaphore dummy_semaphore __attribute__ ((unused));
+		dummy_semaphore.activity = 0;
+	],[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_RWSEM_ACTIVITY, 1,
+		[struct rw_semaphore has member activity])
+	],[
+		AC_MSG_RESULT(no)
+	])
+	EXTRA_KCFLAGS="$tmp_flags"
+])
+
+dnl #
 dnl # 3.9 API change,
 dnl # Moved things from linux/sched.h to linux/sched/rt.h
 dnl #
@@ -1471,6 +1497,30 @@ AC_DEFUN([SPL_AC_MUTEX_OWNER], [
 	],[
 		AC_MSG_RESULT(yes)
 		AC_DEFINE(HAVE_MUTEX_OWNER, 1, [yes])
+	],[
+		AC_MSG_RESULT(no)
+	])
+	EXTRA_KCFLAGS="$tmp_flags"
+])
+
+dnl #
+dnl # 4.7 API change
+dnl # i_mutex is changed to i_rwsem. Instead of directly using
+dnl # i_mutex/i_rwsem, we should use inode_lock() and inode_lock_shared()
+dnl # We test inode_lock_shared because inode_lock is introduced earlier.
+dnl #
+AC_DEFUN([SPL_AC_INODE_LOCK], [
+	AC_MSG_CHECKING([whether inode_lock_shared() exists])
+	tmp_flags="$EXTRA_KCFLAGS"
+	EXTRA_KCFLAGS="-Werror"
+	SPL_LINUX_TRY_COMPILE([
+		#include <linux/fs.h>
+	],[
+		struct inode *inode = NULL;
+		inode_lock_shared(inode);
+	],[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_INODE_LOCK_SHARED, 1, [yes])
 	],[
 		AC_MSG_RESULT(no)
 	])
