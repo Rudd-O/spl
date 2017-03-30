@@ -33,7 +33,6 @@ AC_DEFUN([SPL_AC_CONFIG_KERNEL], [
 	SPL_AC_INODE_TRUNCATE_RANGE
 	SPL_AC_FS_STRUCT_SPINLOCK
 	SPL_AC_KUIDGID_T
-	SPL_AC_PUT_TASK_STRUCT
 	SPL_AC_KERNEL_FALLOCATE
 	SPL_AC_CONFIG_ZLIB_INFLATE
 	SPL_AC_CONFIG_ZLIB_DEFLATE
@@ -43,6 +42,9 @@ AC_DEFUN([SPL_AC_CONFIG_KERNEL], [
 	SPL_AC_RWSEM_ACTIVITY
 	SPL_AC_RWSEM_ATOMIC_LONG_COUNT
 	SPL_AC_SCHED_RT_HEADER
+	SPL_AC_SCHED_SIGNAL_HEADER
+	SPL_AC_4ARGS_VFS_GETATTR
+	SPL_AC_3ARGS_VFS_GETATTR
 	SPL_AC_2ARGS_VFS_GETATTR
 	SPL_AC_USLEEP_RANGE
 	SPL_AC_KMEM_CACHE_ALLOCFLAGS
@@ -50,6 +52,7 @@ AC_DEFUN([SPL_AC_CONFIG_KERNEL], [
 	SPL_AC_MUTEX_OWNER
 	SPL_AC_INODE_LOCK
 	SPL_AC_GROUP_INFO_GID
+	SPL_AC_KMEM_CACHE_CREATE_USERCOPY
 ])
 
 AC_DEFUN([SPL_AC_MODULE_SYMVERS], [
@@ -1082,25 +1085,6 @@ AC_DEFUN([SPL_AC_KUIDGID_T], [
 ])
 
 dnl #
-dnl # 2.6.39 API change,
-dnl # __put_task_struct() was exported by the mainline kernel.
-dnl #
-AC_DEFUN([SPL_AC_PUT_TASK_STRUCT],
-	[AC_MSG_CHECKING([whether __put_task_struct() is available])
-	SPL_LINUX_TRY_COMPILE_SYMBOL([
-		#include <linux/sched.h>
-	], [
-		__put_task_struct(NULL);
-	], [__put_task_struct], [], [
-		AC_MSG_RESULT(yes)
-		AC_DEFINE(HAVE_PUT_TASK_STRUCT, 1,
-		          [__put_task_struct() is available])
-	], [
-		AC_MSG_RESULT(no)
-	])
-])
-
-dnl #
 dnl # 2.6.35 API change,
 dnl # Unused 'struct dentry *' removed from vfs_fsync() prototype.
 dnl #
@@ -1409,33 +1393,84 @@ AC_DEFUN([SPL_AC_SCHED_RT_HEADER],
 ])
 
 dnl #
-dnl # 3.9 API change,
-dnl # vfs_getattr() uses 2 args
-dnl # It takes struct path * instead of struct vfsmount * and struct dentry *
+dnl # 4.11 API change,
+dnl # Moved things from linux/sched.h to linux/sched/signal.h
+dnl #
+AC_DEFUN([SPL_AC_SCHED_SIGNAL_HEADER],
+	[AC_MSG_CHECKING([whether header linux/sched/signal.h exists])
+	SPL_LINUX_TRY_COMPILE([
+		#include <linux/sched.h>
+		#include <linux/sched/signal.h>
+	],[
+		return 0;
+	],[
+		AC_DEFINE(HAVE_SCHED_SIGNAL_HEADER, 1, [linux/sched/signal.h exists])
+		AC_MSG_RESULT(yes)
+	],[
+		AC_MSG_RESULT(no)
+	])
+])
+
+dnl #
+dnl # 4.11 API, a528d35e@torvalds/linux
+dnl # vfs_getattr(const struct path *p, struct kstat *s, u32 m, unsigned int f)
+dnl #
+AC_DEFUN([SPL_AC_4ARGS_VFS_GETATTR], [
+	AC_MSG_CHECKING([whether vfs_getattr() wants 4 args])
+	SPL_LINUX_TRY_COMPILE([
+		#include <linux/fs.h>
+	],[
+		vfs_getattr((const struct path *)NULL,
+			(struct kstat *)NULL,
+			(u32)0,
+			(unsigned int)0);
+	],[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_4ARGS_VFS_GETATTR, 1,
+		  [vfs_getattr wants 4 args])
+	],[
+		AC_MSG_RESULT(no)
+	])
+])
+
+dnl #
+dnl # 3.9 API 
+dnl # vfs_getattr(struct path *p, struct kstat *s)
 dnl #
 AC_DEFUN([SPL_AC_2ARGS_VFS_GETATTR], [
-	AC_MSG_CHECKING([whether vfs_getattr() wants])
+	AC_MSG_CHECKING([whether vfs_getattr() wants 2 args])
 	SPL_LINUX_TRY_COMPILE([
 		#include <linux/fs.h>
 	],[
 		vfs_getattr((struct path *) NULL,
 			(struct kstat *)NULL);
 	],[
-		AC_MSG_RESULT(2 args)
+		AC_MSG_RESULT(yes)
 		AC_DEFINE(HAVE_2ARGS_VFS_GETATTR, 1,
-		          [vfs_getattr wants 2 args])
+			  [vfs_getattr wants 2 args])
 	],[
-		SPL_LINUX_TRY_COMPILE([
-			#include <linux/fs.h>
-		],[
-			vfs_getattr((struct vfsmount *)NULL,
-				(struct dentry *)NULL,
-				(struct kstat *)NULL);
-		],[
-			AC_MSG_RESULT(3 args)
-		],[
-			AC_MSG_ERROR(unknown)
-		])
+		AC_MSG_RESULT(no)
+	])
+])
+
+dnl #
+dnl # <3.9 API 
+dnl # vfs_getattr(struct vfsmount *v, struct dentry *d, struct kstat *k)
+dnl #
+AC_DEFUN([SPL_AC_3ARGS_VFS_GETATTR], [
+	AC_MSG_CHECKING([whether vfs_getattr() wants 3 args])
+	SPL_LINUX_TRY_COMPILE([
+		#include <linux/fs.h>
+	],[
+		vfs_getattr((struct vfsmount *)NULL,
+			(struct dentry *)NULL,
+			(struct kstat *)NULL);
+	],[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_3ARGS_VFS_GETATTR, 1,
+		  [vfs_getattr wants 3 args])
+	],[
+		AC_MSG_RESULT(no)
 	])
 ])
 
@@ -1592,6 +1627,42 @@ AC_DEFUN([SPL_AC_GROUP_INFO_GID], [
 	],[
 		AC_MSG_RESULT(yes)
 		AC_DEFINE(HAVE_GROUP_INFO_GID, 1, [group_info->gid exists])
+	],[
+		AC_MSG_RESULT(no)
+	])
+	EXTRA_KCFLAGS="$tmp_flags"
+])
+
+dnl #
+dnl # grsecurity API change,
+dnl # kmem_cache_create() with SLAB_USERCOPY flag replaced by
+dnl # kmem_cache_create_usercopy().
+dnl #
+AC_DEFUN([SPL_AC_KMEM_CACHE_CREATE_USERCOPY], [
+	AC_MSG_CHECKING([whether kmem_cache_create_usercopy() exists])
+	tmp_flags="$EXTRA_KCFLAGS"
+	EXTRA_KCFLAGS="-Werror"
+	SPL_LINUX_TRY_COMPILE([
+		#include <linux/slab.h>
+		static void ctor(void *foo)
+		{
+			// fake ctor
+		}
+	],[
+		struct kmem_cache *skc_linux_cache;
+		const char *name = "test";
+		size_t size = 4096;
+		size_t align = 8;
+		unsigned long flags = 0;
+		size_t useroffset = 0;
+		size_t usersize = size - useroffset;
+
+		skc_linux_cache = kmem_cache_create_usercopy(
+			name, size, align, flags, useroffset, usersize, ctor);
+	],[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_KMEM_CACHE_CREATE_USERCOPY, 1,
+				[kmem_cache_create_usercopy() exists])
 	],[
 		AC_MSG_RESULT(no)
 	])
