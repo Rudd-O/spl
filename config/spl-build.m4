@@ -49,10 +49,11 @@ AC_DEFUN([SPL_AC_CONFIG_KERNEL], [
 	SPL_AC_USLEEP_RANGE
 	SPL_AC_KMEM_CACHE_ALLOCFLAGS
 	SPL_AC_WAIT_ON_BIT
-	SPL_AC_MUTEX_OWNER
 	SPL_AC_INODE_LOCK
 	SPL_AC_GROUP_INFO_GID
 	SPL_AC_KMEM_CACHE_CREATE_USERCOPY
+	SPL_AC_WAIT_QUEUE_ENTRY_T
+	SPL_AC_WAIT_QUEUE_HEAD_ENTRY
 ])
 
 AC_DEFUN([SPL_AC_MODULE_SYMVERS], [
@@ -113,6 +114,7 @@ AC_DEFUN([SPL_AC_KERNEL], [
 		if test "$kernelsrc" = "NONE"; then
 			kernsrcver=NONE
 		fi
+		withlinux=yes
 	fi
 
 	AC_MSG_RESULT([$kernelsrc])
@@ -125,7 +127,7 @@ AC_DEFUN([SPL_AC_KERNEL], [
 
 	AC_MSG_CHECKING([kernel build directory])
 	if test -z "$kernelbuild"; then
-		if test -e "/lib/modules/$(uname -r)/build"; then
+		if test x$withlinux != xyes -a -e "/lib/modules/$(uname -r)/build"; then
 			kernelbuild=`readlink -f /lib/modules/$(uname -r)/build`
 		elif test -d ${kernelsrc}-obj/${target_cpu}/${target_cpu}; then
 			kernelbuild=${kernelsrc}-obj/${target_cpu}/${target_cpu}
@@ -1312,7 +1314,8 @@ AC_DEFUN([SPL_AC_RWSEM_SPINLOCK_IS_RAW], [
 		#include <linux/rwsem.h>
 	],[
 		struct rw_semaphore dummy_semaphore __attribute__ ((unused));
-		raw_spinlock_t dummy_lock __attribute__ ((unused));
+		raw_spinlock_t dummy_lock __attribute__ ((unused)) =
+		    __RAW_SPIN_LOCK_INITIALIZER(dummy_lock);
 		dummy_semaphore.wait_lock = dummy_lock;
 	],[
 		AC_MSG_RESULT(yes)
@@ -1559,35 +1562,6 @@ AC_DEFUN([SPL_AC_WAIT_ON_BIT], [
 ])
 
 dnl #
-dnl # Check whether mutex has owner with task_struct type.
-dnl #
-dnl # Note that before Linux 3.0, mutex owner is of type thread_info.
-dnl #
-dnl # Note that in Linux 3.18, the condition for owner is changed from
-dnl # defined(CONFIG_DEBUG_MUTEXES) || defined(CONFIG_SMP) to
-dnl # defined(CONFIG_DEBUG_MUTEXES) || defined(CONFIG_MUTEX_SPIN_ON_OWNER)
-dnl #
-AC_DEFUN([SPL_AC_MUTEX_OWNER], [
-	AC_MSG_CHECKING([whether mutex has owner])
-	tmp_flags="$EXTRA_KCFLAGS"
-	EXTRA_KCFLAGS="-Werror"
-	SPL_LINUX_TRY_COMPILE([
-		#include <linux/mutex.h>
-		#include <linux/spinlock.h>
-	],[
-		DEFINE_MUTEX(m);
-		struct task_struct *t __attribute__ ((unused));
-		t = m.owner;
-	],[
-		AC_MSG_RESULT(yes)
-		AC_DEFINE(HAVE_MUTEX_OWNER, 1, [yes])
-	],[
-		AC_MSG_RESULT(no)
-	])
-	EXTRA_KCFLAGS="$tmp_flags"
-])
-
-dnl #
 dnl # 4.7 API change
 dnl # i_mutex is changed to i_rwsem. Instead of directly using
 dnl # i_mutex/i_rwsem, we should use inode_lock() and inode_lock_shared()
@@ -1667,4 +1641,57 @@ AC_DEFUN([SPL_AC_KMEM_CACHE_CREATE_USERCOPY], [
 		AC_MSG_RESULT(no)
 	])
 	EXTRA_KCFLAGS="$tmp_flags"
+])
+
+dnl #
+dnl # 4.13 API change
+dnl # Renamed struct wait_queue -> struct wait_queue_entry.
+dnl #
+AC_DEFUN([SPL_AC_WAIT_QUEUE_ENTRY_T], [
+	AC_MSG_CHECKING([whether wait_queue_entry_t exists])
+	SPL_LINUX_TRY_COMPILE([
+		#include <linux/wait.h>
+	],[
+		wait_queue_entry_t *entry __attribute__ ((unused));
+	],[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_WAIT_QUEUE_ENTRY_T, 1,
+		    [wait_queue_entry_t exists])
+	],[
+		AC_MSG_RESULT(no)
+	])
+])
+
+dnl #
+dnl # 4.13 API change
+dnl # Renamed wait_queue_head::task_list -> wait_queue_head::head
+dnl # Renamed wait_queue_entry::task_list -> wait_queue_entry::entry
+dnl #
+AC_DEFUN([SPL_AC_WAIT_QUEUE_HEAD_ENTRY], [
+	AC_MSG_CHECKING([whether wq_head->head and wq_entry->entry exist])
+	SPL_LINUX_TRY_COMPILE([
+		#include <linux/wait.h>
+
+		#ifdef HAVE_WAIT_QUEUE_ENTRY_T
+		typedef wait_queue_head_t	spl_wait_queue_head_t;
+		typedef wait_queue_entry_t	spl_wait_queue_entry_t;
+		#else
+		typedef wait_queue_head_t	spl_wait_queue_head_t;
+		typedef wait_queue_t		spl_wait_queue_entry_t;
+		#endif
+	],[
+		spl_wait_queue_head_t wq_head;
+		spl_wait_queue_entry_t wq_entry;
+		struct list_head *head __attribute__ ((unused));
+		struct list_head *entry __attribute__ ((unused));
+
+		head = &wq_head.head;
+		entry = &wq_entry.entry;
+	],[
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_WAIT_QUEUE_HEAD_ENTRY, 1,
+		    [wq_head->head and wq_entry->entry exist])
+	],[
+		AC_MSG_RESULT(no)
+	])
 ])

@@ -40,10 +40,7 @@ typedef enum {
 typedef struct {
 	struct mutex		m_mutex;
 	spinlock_t		m_lock;	/* used for serializing mutex_exit */
-#ifndef HAVE_MUTEX_OWNER
-	/* only when kernel doesn't have owner */
 	kthread_t		*m_owner;
-#endif
 #ifdef CONFIG_LOCKDEP
 	kmutex_type_t		m_type;
 #endif /* CONFIG_LOCKDEP */
@@ -54,28 +51,16 @@ typedef struct {
 static inline void
 spl_mutex_set_owner(kmutex_t *mp)
 {
-	/*
-	 * kernel will handle its owner, so we don't need to do anything if it
-	 * is defined.
-	 */
-#ifndef HAVE_MUTEX_OWNER
 	mp->m_owner = current;
-#endif
 }
 
 static inline void
 spl_mutex_clear_owner(kmutex_t *mp)
 {
-#ifndef HAVE_MUTEX_OWNER
 	mp->m_owner = NULL;
-#endif
 }
 
-#ifdef HAVE_MUTEX_OWNER
-#define	mutex_owner(mp)		(ACCESS_ONCE(MUTEX(mp)->owner))
-#else
 #define	mutex_owner(mp)		(ACCESS_ONCE((mp)->m_owner))
-#endif
 #define	mutex_owned(mp)		(mutex_owner(mp) == current)
 #define	MUTEX_HELD(mp)		mutex_owned(mp)
 #define	MUTEX_NOT_HELD(mp)	(!MUTEX_HELD(mp))
@@ -183,12 +168,13 @@ spl_mutex_lockdep_on_maybe(kmutex_t *mp)			\
  */
 #define	mutex_exit(mp)						\
 {								\
-	spl_mutex_lockdep_off_maybe(mp);			\
-	spin_lock(&(mp)->m_lock);				\
 	spl_mutex_clear_owner(mp);				\
+	spin_lock(&(mp)->m_lock);				\
+	spl_mutex_lockdep_off_maybe(mp);			\
 	mutex_unlock(MUTEX(mp));				\
-	spin_unlock(&(mp)->m_lock);				\
 	spl_mutex_lockdep_on_maybe(mp);				\
+	spin_unlock(&(mp)->m_lock);				\
+	/* NOTE: do not dereference mp after this point */	\
 }
 
 int spl_mutex_init(void);
