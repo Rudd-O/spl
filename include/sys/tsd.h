@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2010 Lawrence Livermore National Security, LLC.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Brian Behlendorf <behlendorf1@llnl.gov>.
@@ -19,17 +19,17 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_TSD_H
-#define _SPL_TSD_H
+#define	_SPL_TSD_H
 
 #include <sys/types.h>
 
-#define TSD_HASH_TABLE_BITS_DEFAULT	9
-#define TSD_KEYS_MAX			32768
-#define DTOR_PID			(PID_MAX_LIMIT+1)
-#define PID_KEY				(TSD_KEYS_MAX+1)
+#define	TSD_HASH_TABLE_BITS_DEFAULT	9
+#define	TSD_KEYS_MAX			32768
+#define	DTOR_PID			(PID_MAX_LIMIT+1)
+#define	PID_KEY				(TSD_KEYS_MAX+1)
 
 typedef void (*dtor_func_t)(void *);
 

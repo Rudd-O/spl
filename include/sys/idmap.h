@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2010 Lawrence Livermore National Security, LLC.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Brian Behlendorf <behlendorf1@llnl.gov>.
@@ -19,11 +19,11 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_IDMAP_H
-#define _SPL_IDMAP_H
+#define	_SPL_IDMAP_H
 
-#define IDMAP_WK_CREATOR_OWNER_UID	2147483648U
+#define	IDMAP_WK_CREATOR_OWNER_UID	2147483648U
 
 #endif /* SPL_IDMAP_H */

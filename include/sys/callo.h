@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2013 Lawrence Livermore National Security, LLC.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Brian Behlendorf <behlendorf1@llnl.gov>.
@@ -19,10 +19,10 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_CALLO_H
-#define _SPL_CALLO_H
+#define	_SPL_CALLO_H
 
 /*
  * Callout flags:
@@ -44,9 +44,9 @@
  *      Legacy interfaces timeout() and realtime_timeout() pass this flag
  *      to timeout_generic() to indicate that a 32-bit ID should be allocated.
  */
-#define CALLOUT_FLAG_ROUNDUP            0x1
-#define CALLOUT_FLAG_ABSOLUTE           0x2
-#define CALLOUT_FLAG_HRESTIME           0x4
-#define CALLOUT_FLAG_32BIT              0x8
+#define	CALLOUT_FLAG_ROUNDUP		0x1
+#define	CALLOUT_FLAG_ABSOLUTE		0x2
+#define	CALLOUT_FLAG_HRESTIME		0x4
+#define	CALLOUT_FLAG_32BIT		0x8
 
 #endif  /* _SPL_CALLB_H */

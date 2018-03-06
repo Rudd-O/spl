@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -20,7 +20,7 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_RANDOM_H
 #define	_SPL_RANDOM_H
@@ -31,8 +31,8 @@
 static __inline__ int
 random_get_bytes(uint8_t *ptr, size_t len)
 {
-	get_random_bytes((void *)ptr,(int)len);
-	return 0;
+	get_random_bytes((void *)ptr, (int)len);
+	return (0);
 }
 
 extern int random_get_pseudo_bytes(uint8_t *ptr, size_t len);

@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -20,10 +20,10 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_CRED_H
-#define _SPL_CRED_H
+#define	_SPL_CRED_H
 
 #include <linux/module.h>
 #include <sys/types.h>
@@ -68,7 +68,7 @@ extern gid_t crgetrgid(const cred_t *cr);
 extern gid_t crgetsgid(const cred_t *cr);
 extern gid_t crgetfsgid(const cred_t *cr);
 extern int crgetngroups(const cred_t *cr);
-extern gid_t * crgetgroups(const cred_t *cr);
+extern gid_t *crgetgroups(const cred_t *cr);
 extern int groupmember(gid_t gid, const cred_t *cr);
 
 #endif  /* _SPL_CRED_H */

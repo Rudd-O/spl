@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -20,17 +20,17 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_PARAM_H
-#define _SPL_PARAM_H
+#define	_SPL_PARAM_H
 
 #include <asm/page.h>
 
 /* Pages to bytes and back */
-#define ptob(pages)			(pages << PAGE_SHIFT)
-#define btop(bytes)			(bytes >> PAGE_SHIFT)
+#define	ptob(pages)			((pages) << PAGE_SHIFT)
+#define	btop(bytes)			((bytes) >> PAGE_SHIFT)
 
-#define MAXUID				UINT32_MAX
+#define	MAXUID				UINT32_MAX
 
 #endif /* SPL_PARAM_H */

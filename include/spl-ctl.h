@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -20,26 +20,26 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _DEBUG_CTL_H
-#define _DEBUG_CTL_H
+#define	_DEBUG_CTL_H
 
 /*
  * Contains shared definitions which both the user space
  * and kernel space portions of splat must agree on.
  */
 typedef struct spl_debug_header {
-        int ph_len;
-        int ph_flags;
-        int ph_subsys;
-        int ph_mask;
-        int ph_cpu_id;
-        int ph_sec;
-        long ph_usec;
-        int ph_stack;
-        int ph_pid;
-        int ph_line_num;
+	int ph_len;
+	int ph_flags;
+	int ph_subsys;
+	int ph_mask;
+	int ph_cpu_id;
+	int ph_sec;
+	long ph_usec;
+	int ph_stack;
+	int ph_pid;
+	int ph_line_num;
 } spl_debug_header_t;
 
 #endif /* _DEBUG_CTL_H */

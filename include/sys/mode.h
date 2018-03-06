@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -20,13 +20,13 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_MODE_H
-#define _SPL_MODE_H
+#define	_SPL_MODE_H
 
-#define IFTOVT(mode)	vn_mode_to_vtype(mode)
-#define VTTOIF(vtype)	vn_vtype_to_mode(vtype)
-#define MAKEIMODE(T, M) (VTTOIF(T) | ((M) & ~S_IFMT))
+#define	IFTOVT(mode)	vn_mode_to_vtype(mode)
+#define	VTTOIF(vtype)	vn_vtype_to_mode(vtype)
+#define	MAKEIMODE(T, M) (VTTOIF(T) | ((M) & ~S_IFMT))
 
 #endif /* SPL_MODE_H */

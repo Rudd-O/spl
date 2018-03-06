@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -20,7 +20,7 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_TYPES_H
 #define	_SPL_TYPES_H
@@ -29,14 +29,14 @@
 #include <sys/sysmacros.h>
 
 #ifndef ULLONG_MAX
-#define ULLONG_MAX			(~0ULL)
+#define	ULLONG_MAX			(~0ULL)
 #endif
 
 #ifndef LLONG_MAX
-#define LLONG_MAX			((long long)(~0ULL>>1))
+#define	LLONG_MAX			((long long)(~0ULL>>1))
 #endif
 
-typedef enum { B_FALSE=0, B_TRUE=1 }	boolean_t;
+typedef enum { B_FALSE = 0, B_TRUE = 1 }	boolean_t;
 typedef unsigned long			intptr_t;
 typedef unsigned long			ulong_t;
 typedef unsigned int			uint_t;

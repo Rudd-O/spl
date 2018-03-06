@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2015 Cluster Inc.
  *  Produced at ClusterHQ Inc (cf, DISCLAIMER).
  *  Written by Richard Yao <richard.yao@clusterhq.com>.
@@ -18,10 +18,10 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_USER_H
-#define _SPL_USER_H
+#define	_SPL_USER_H
 
 /*
  * We have uf_info_t for areleasef(). We implement areleasef() using a global
@@ -37,6 +37,6 @@
 struct uf_info;
 typedef struct uf_info uf_info_t;
 
-#define P_FINFO(x) ((uf_info_t *)x)
+#define	P_FINFO(x) ((uf_info_t *)x)
 
 #endif /* SPL_USER_H */

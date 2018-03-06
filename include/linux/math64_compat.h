@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -20,13 +20,14 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_MATH64_COMPAT_H
-#define _SPL_MATH64_COMPAT_H
+#define	_SPL_MATH64_COMPAT_H
 
 #ifndef abs64
-#define abs64(x)	({ uint64_t t = (x) >> 63; ((x) ^ t) - t; })
+/* CSTYLED */
+#define	abs64(x)	({ uint64_t t = (x) >> 63; ((x) ^ t) - t; })
 #endif
 
 #endif /* _SPL_MATH64_COMPAT_H */

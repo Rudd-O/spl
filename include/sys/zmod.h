@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -20,7 +20,8 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************
+ *
+ *
  *  z_compress_level/z_uncompress are nearly identical copies of the
  *  compress2/uncompress functions provided by the official zlib package
  *  available at http://zlib.net/.  The only changes made we to slightly
@@ -50,10 +51,10 @@
  *
  *  Jean-loup Gailly
  *  Mark Adler
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_ZMOD_H
-#define _SPL_ZMOD_H
+#define	_SPL_ZMOD_H
 
 #include <sys/types.h>
 #include <linux/zlib.h>

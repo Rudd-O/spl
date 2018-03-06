@@ -1,4 +1,4 @@
-/*****************************************************************************\
+/*
  *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -20,7 +20,7 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with the SPL.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ */
 
 #ifndef _SPL_DKIOC_UTIL_H
 #define	_SPL_DKIOC_UTIL_H
@@ -52,7 +52,7 @@ static inline void dfl_free(dkioc_free_list_t *dfl) {
 }
 
 static inline dkioc_free_list_t *dfl_alloc(uint64_t dfl_num_exts, int flags) {
-	return vmem_zalloc(DFL_SZ(dfl_num_exts), flags);
+	return (vmem_zalloc(DFL_SZ(dfl_num_exts), flags));
 }
 
 #endif /* _SPL_DKIOC_UTIL_H */
